@@ -12,9 +12,9 @@
  *   - ratings: { id, stadiumId (FK), userId (FK), lighting, pitch, cleanliness, comment, date }
  */
 
-const API_URL = window.location.hostname === 'localhost' 
+const API_URL = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' 
   ? 'http://localhost:5000/api' 
-  : '/api';
+  : '/api');
 
 class DataService {
   // --- Auth & Users ---
