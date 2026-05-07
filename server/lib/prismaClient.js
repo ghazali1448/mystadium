@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { PrismaLibSQL } from '@prisma/adapter-libsql';
+import * as LibSQLAdapter from '@prisma/adapter-libsql';
 import { createClient } from '@libsql/client';
 import "dotenv/config";
 
@@ -12,7 +12,8 @@ if (process.env.TURSO_AUTH_TOKEN && process.env.DATABASE_URL?.startsWith('libsql
     url: process.env.DATABASE_URL,
     authToken: process.env.TURSO_AUTH_TOKEN,
   });
-  const adapter = new PrismaLibSQL({ client: libsql });
+  const AdapterClass = LibSQLAdapter.PrismaLibSQL || LibSQLAdapter.PrismaLibSql || LibSQLAdapter.default;
+  const adapter = new AdapterClass({ client: libsql });
   prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 } else {
   prisma = globalForPrisma.prisma || new PrismaClient();
