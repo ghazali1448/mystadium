@@ -1,15 +1,6 @@
 import prisma from '../lib/prismaClient.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
-import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dbPath = path.join(__dirname, '..', 'prisma', 'dev.db');
 
 export const signup = async (req, res) => {
   try {
@@ -18,68 +9,63 @@ export const signup = async (req, res) => {
       stadiumName, location, workingHours, pricePerHour, capacity 
     } = req.body;
 
-    // Direct DB connection to bypass Prisma locks
-    const db = await open({
-      filename: dbPath,
-      driver: sqlite3.Database
-    });
-
-    // Check existing
-    const existing = await db.get('SELECT id FROM User WHERE email = ?', [email]);
+    // Check if user already exists
+    const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      await db.close();
       return res.status(400).json({ message: 'User already exists' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
-    const userId = uuidv4();
-    const now = new Date().toISOString();
 
-    // 1. Create User
-    await db.run(
-      'INSERT INTO User (id, email, password, fullName, role, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [userId, email, hashedPassword, fullName, role || 'player', now, now]
-    );
+    // Create user with Prisma
+    const user = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        fullName,
+        role: role || 'player'
+      }
+    });
 
+    // If owner, create stadium too
     let stadium = null;
     if (role === 'owner' && stadiumName) {
-      const stadiumId = uuidv4();
-      
       const photoFile = req.files?.['photo']?.[0];
       const docFile = req.files?.['ownershipDoc']?.[0];
       
       const photoUrl = photoFile ? `/uploads/${photoFile.filename}` : null;
       const ownershipDocUrl = docFile ? `/uploads/${docFile.filename}` : null;
-      
-      // 2. Create Stadium
-      await db.run(
-        'INSERT INTO Stadium (id, name, location, pricePerHour, capacity, workingHours, photoUrl, ownershipDocUrl, ownerId, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [stadiumId, stadiumName, location || '', parseFloat(pricePerHour) || 0, parseInt(capacity) || 0, workingHours || '08:00 - 22:00', photoUrl, ownershipDocUrl, userId, now, now]
-      );
-      
-      stadium = { id: stadiumId, name: stadiumName, photoUrl, ownershipDocUrl };
+
+      stadium = await prisma.stadium.create({
+        data: {
+          name: stadiumName,
+          location: location || '',
+          pricePerHour: parseFloat(pricePerHour) || 0,
+          capacity: parseInt(capacity) || 0,
+          workingHours: workingHours || '08:00 - 22:00',
+          photoUrl,
+          ownershipDocUrl,
+          ownerId: user.id
+        }
+      });
     }
 
-    await db.close();
-
     const token = jwt.sign(
-      { userId, email, role: role || 'player' },
+      { userId: user.id, email, role: role || 'player' },
       process.env.JWT_SECRET || 'secret',
       { expiresIn: '1d' }
     );
 
     res.status(201).json({ 
       token, 
-      user: { id: userId, email, fullName, role, stadium } 
+      user: { id: user.id, email, fullName, role: user.role, stadium } 
     });
 
   } catch (error) {
-    console.error('DIRECT DB SIGNUP ERROR:', error);
+    console.error('SIGNUP ERROR:', error);
     res.status(500).json({ message: 'Internal Server Error', debug: error.message });
   }
 };
-
-
 
 export const login = async (req, res) => {
   try {

@@ -14,9 +14,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/adapter-libsql": "^6.0.0",
     "@prisma/client": "^6.0.0",
-    "@libsql/client": "^0.14.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
@@ -25,16 +23,12 @@
     "i18next": "^26.0.3",
     "i18next-browser-languagedetector": "^8.2.1",
     "jsonwebtoken": "^9.0.3",
-    "libsql": "^0.5.29",
     "lucide-react": "^0.400.0",
     "multer": "^2.1.1",
     "node-cron": "^4.2.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "react-i18next": "^17.0.2",
-    "sqlite": "^5.1.1",
-    "sqlite3": "^6.0.1",
-    "uuid": "^14.0.0"
+    "react-i18next": "^17.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

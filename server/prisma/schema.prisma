@@ -1,10 +1,12 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -46,6 +48,9 @@ model Stadium {
   owner        User      @relation(fields: [ownerId], references: [id])
   bookings     Booking[]
   ratings      Rating[]
+
+  // Indexes for performance
+  @@index([ownerId])
 }
 
 model Booking {
@@ -54,7 +59,7 @@ model Booking {
   userId    String
   date      DateTime
   slot      String
-  status    String   @default("confirmed") // "pending", "confirmed", "cancelled"
+  status    String   @default("confirmed") // "pending", "confirmed", "cancelled", "rejected"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -62,6 +67,10 @@ model Booking {
   stadium   Stadium  @relation(fields: [stadiumId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
   match     Match?
+
+  // Indexes for performance
+  @@index([stadiumId])
+  @@index([userId])
 }
 
 model Match {
@@ -70,9 +79,9 @@ model Match {
   neededPlayers  Int
   ageGroup       String
   phone          String
-  status         String   @default("open") // "open", "closed"
+  status         String   @default("open") // "open", "closed", "cancelled"
   createdAt      DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt      DateTime @updatedAt
 
   // Relations
   booking        Booking  @relation(fields: [bookingId], references: [id])
@@ -90,8 +99,9 @@ model MatchParticipant {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([matchId, userId])
+  @@index([matchId])
+  @@index([userId])
 }
-
 
 model Rating {
   id           String   @id @default(uuid())
@@ -100,13 +110,17 @@ model Rating {
   lighting     Int
   pitchQuality Int
   cleanliness  Int
-  comment      String?
+  comment      String?  @db.Text
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   // Relations
   stadium      Stadium  @relation(fields: [stadiumId], references: [id])
   user         User     @relation(fields: [userId], references: [id])
+
+  // Indexes for performance
+  @@index([stadiumId])
+  @@index([userId])
 }
 
 model Notification {
@@ -114,13 +128,16 @@ model Notification {
   userId    String
   type      String   // "booking_new", "booking_confirmed", "match_reminder", "rate_stadium", "discount", "rating_new"
   title     String
-  message   String
+  message   String   @db.Text
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   
-  // Optional meta data (JSON string or specific relations)
-  relatedId String?  // e.g., bookingId or stadiumId
+  // Optional meta data
+  relatedId String?
   
   // Relations
   user      User     @relation(fields: [userId], references: [id])
+
+  // Indexes for performance
+  @@index([userId])
 }
