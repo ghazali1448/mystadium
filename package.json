@@ -14,8 +14,9 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@prisma/adapter-libsql": "^7.7.0",
+    "@prisma/adapter-libsql": "^6.0.0",
     "@prisma/client": "^6.0.0",
+    "@libsql/client": "^0.14.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.1",
