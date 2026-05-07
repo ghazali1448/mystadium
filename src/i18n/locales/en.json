@@ -1,0 +1,114 @@
+{
+  "welcome": {
+    "title": "MyStadium",
+    "subtitle": "Book your pitch, build your team",
+    "login": "Login",
+    "signup": "Create New Account",
+    "terms": "By continuing, you agree to our",
+    "terms_link": "Terms of Use",
+    "privacy_link": "Privacy Policy",
+    "terms_and": "and"
+  },
+  "role": {
+    "title": "Choose Account Type",
+    "player_title": "Player",
+    "player_desc": "Search for pitches and join matches",
+    "owner_title": "Stadium Owner",
+    "owner_desc": "Add your stadium and manage bookings",
+    "next": "Next",
+    "back": "Back"
+  },
+  "auth": {
+    "login_title": "Welcome Back!",
+    "login_subtitle": "Login to continue to your account",
+    "signup_title": "Create New Account",
+    "signup_subtitle": "Join us and start playing!",
+    "owner_signup_title": "Create Stadium Owner Account",
+    "role_select": "Choose Account Type",
+    "player": "Player",
+    "owner": "Stadium Owner",
+    "fullname": "Full Name",
+    "fullname_placeholder": "Enter your full name",
+    "email": "Email",
+    "email_placeholder": "Enter your email",
+    "password": "Password",
+    "password_placeholder": "Enter your password",
+    "confirm_password": "Confirm Password",
+    "confirm_password_placeholder": "Re-enter your password",
+    "account_info": "Account Information",
+    "stadium_details": "Stadium Details",
+    "stadium_name": "Stadium Name",
+    "stadium_name_placeholder": "e.g. Al-Nujoom Stadium",
+    "stadium_location": "Location",
+    "stadium_location_placeholder": "Enter address or use map",
+    "phone": "Contact Phone",
+    "phone_placeholder": "05XXXXXXXX",
+    "working_hours": "Working Hours",
+    "start_time": "Start Time",
+    "end_time": "End Time",
+    "price_per_hour": "Price/Hour (DZD)",
+    "price_per_hour_placeholder": "1000",
+    "capacity": "Number of Players",
+    "capacity_placeholder": "12",
+    "stadium_photo": "Stadium Photo",
+    "ownership_doc": "Ownership Document",
+    "ownership_doc_placeholder": "Upload Ownership Document",
+    "photo_upload": "Drag & drop or click to upload",
+    "forgot_password": "Forgot your password?",
+    "no_account": "Don't have an account?",
+    "signup_now": "Sign up now",
+    "already_account": "Already have an account?",
+    "login_link": "Login",
+    "submit_login": "Login",
+    "submit_signup": "Create Account",
+    "submit_owner_signup": "Complete Registration",
+    "or_login_with": "Or login with",
+    "back": "Back",
+    "password_mismatch": "Passwords do not match",
+    "error_generic": "An error occurred, please try again",
+    "invalid_credentials": "Invalid email or password"
+  },
+  "player": {
+    "location_prompt": "Please enable geolocation to see stadiums near you",
+    "tabs": {
+      "search_stadium": "Search Stadium",
+      "search_opponent": "Search Opponent",
+      "rate_stadium": "Rate Stadium"
+    },
+    "stadium": {
+      "nearby": "Stadiums near you",
+      "available_times": "Available Times",
+      "booked_times": "Booked Times",
+      "book_now": "Book Now",
+      "booking_confirmed": "Booking successful!"
+    },
+    "opponent": {
+      "available_opponents": "Opponents looking for a team",
+      "join_match": "Join match",
+      "create_match": "Create new match",
+      "average_age": "Average Age",
+      "match_details": "Match Details",
+      "wait_for_opponent": "Match created!"
+    },
+    "rating": {
+      "title": "Rate your experience",
+      "lighting": "Lighting",
+      "pitch_quality": "Pitch Quality",
+      "cleanliness": "Cleanliness",
+      "submit_rating": "Save Rating",
+      "rating_saved": "Thanks for your rating!"
+    }
+  },
+  "owner": {
+    "dashboard_title": "Stadium Dashboard",
+    "my_stadium": "My Stadium",
+    "statistics": "Stats & Ratings",
+    "status_booked": "Booked",
+    "status_available": "Available"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "success": "Success"
+  }
+}

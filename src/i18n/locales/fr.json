@@ -1,0 +1,112 @@
+{
+  "welcome": {
+    "title": "MyStadium",
+    "subtitle": "Réservez votre terrain, formez votre équipe",
+    "login": "Se Connecter",
+    "signup": "Créer un Nouveau Compte",
+    "terms": "En continuant, vous acceptez nos",
+    "terms_link": "Conditions d'utilisation",
+    "privacy_link": "Politique de confidentialité",
+    "terms_and": "et"
+  },
+  "role": {
+    "title": "Choisissez le type de compte",
+    "player_title": "Joueur",
+    "player_desc": "Cherchez des terrains et rejoignez des matchs",
+    "owner_title": "Propriétaire de Stade",
+    "owner_desc": "Ajoutez votre stade et gérez les réservations",
+    "next": "Suivant",
+    "back": "Retour"
+  },
+  "auth": {
+    "login_title": "Bon retour !",
+    "login_subtitle": "Connectez-vous pour accéder à votre compte",
+    "signup_title": "Créer un Nouveau Compte",
+    "signup_subtitle": "Rejoignez-nous et commencez à jouer !",
+    "owner_signup_title": "Créer un Compte Propriétaire",
+    "role_select": "Type de compte",
+    "player": "Joueur",
+    "owner": "Propriétaire",
+    "fullname": "Nom Complet",
+    "fullname_placeholder": "Entrez votre nom complet",
+    "email": "E-mail",
+    "email_placeholder": "Entrez votre e-mail",
+    "password": "Mot de passe",
+    "password_placeholder": "Entrez votre mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "confirm_password_placeholder": "Ré-entrez votre mot de passe",
+    "account_info": "Informations du compte",
+    "stadium_details": "Détails du stade",
+    "stadium_name": "Nom du Stade",
+    "stadium_name_placeholder": "ex: Stade Al-Nujoom",
+    "stadium_location": "Localisation",
+    "stadium_location_placeholder": "Entrez l'adresse ou utilisez la carte",
+    "phone": "Téléphone de contact",
+    "phone_placeholder": "05XXXXXXXX",
+    "working_hours": "Heures d'ouverture",
+    "start_time": "Début",
+    "end_time": "Fin",
+    "price_per_hour": "Prix/Heure (DZD)",
+    "price_per_hour_placeholder": "1000",
+    "capacity": "Nombre de joueurs",
+    "capacity_placeholder": "12",
+    "stadium_photo": "Photo du stade",
+    "photo_upload": "Glissez-déposez ou cliquez pour télécharger",
+    "forgot_password": "Mot de passe oublié ?",
+    "no_account": "Pas de compte ?",
+    "signup_now": "Inscrivez-vous",
+    "already_account": "Déjà un compte ?",
+    "login_link": "Se connecter",
+    "submit_login": "Se Connecter",
+    "submit_signup": "Créer le Compte",
+    "submit_owner_signup": "Finaliser l'inscription",
+    "or_login_with": "Ou connectez-vous avec",
+    "back": "Retour",
+    "password_mismatch": "Les mots de passe ne correspondent pas",
+    "error_generic": "Une erreur est survenue, veuillez réessayer",
+    "invalid_credentials": "E-mail ou mot de passe incorrect"
+  },
+  "player": {
+    "location_prompt": "Veuillez activer la géolocalisation pour voir les stades proches",
+    "tabs": {
+      "search_stadium": "Chercher Stade",
+      "search_opponent": "Chercher Adversaire",
+      "rate_stadium": "Évaluer Stade"
+    },
+    "stadium": {
+      "nearby": "Stades à proximité",
+      "available_times": "Heures Disponibles",
+      "booked_times": "Heures Réservées",
+      "book_now": "Réserver",
+      "booking_confirmed": "Réservation réussie !"
+    },
+    "opponent": {
+      "available_opponents": "Adversaires cherchant une équipe",
+      "join_match": "Rejoindre match",
+      "create_match": "Créer un nouveau match",
+      "average_age": "Âge moyen",
+      "match_details": "Détails du match",
+      "wait_for_opponent": "Match créé !"
+    },
+    "rating": {
+      "title": "Évaluez votre expérience",
+      "lighting": "Éclairage",
+      "pitch_quality": "Qualité du terrain",
+      "cleanliness": "Propreté",
+      "submit_rating": "Enregistrer",
+      "rating_saved": "Merci pour votre évaluation !"
+    }
+  },
+  "owner": {
+    "dashboard_title": "Tableau de Bord",
+    "my_stadium": "Mon Stade",
+    "statistics": "Stats & Évaluations",
+    "status_booked": "Réservé",
+    "status_available": "Disponible"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "success": "Succès"
+  }
+}

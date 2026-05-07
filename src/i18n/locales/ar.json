@@ -1,0 +1,114 @@
+{
+  "welcome": {
+    "title": "MyStadium",
+    "subtitle": "احجز ملعبك، كوّن فريقك",
+    "login": "تسجيل الدخول",
+    "signup": "إنشاء حساب جديد",
+    "terms": "بالاستمرار، أنت توافق على",
+    "terms_link": "شروط الاستخدام",
+    "privacy_link": "سياسة الخصوصية",
+    "terms_and": "و"
+  },
+  "role": {
+    "title": "اختر نوع حسابك",
+    "player_title": "لاعب",
+    "player_desc": "ابحث عن ملاعب وانضم لمباريات",
+    "owner_title": "صاحب ملعب",
+    "owner_desc": "أضف ملعبك وقم بإدارة الحجوزات",
+    "next": "التالي",
+    "back": "عودة"
+  },
+  "auth": {
+    "login_title": "أهلاً بعودتك!",
+    "login_subtitle": "سجل الدخول للمتابعة إلى حسابك",
+    "signup_title": "إنشاء حساب جديد",
+    "signup_subtitle": "انضم إلينا وابدأ اللعب!",
+    "owner_signup_title": "إنشاء حساب مالك ملعب",
+    "role_select": "اختر نوع الحساب",
+    "player": "لاعب",
+    "owner": "صاحب ملعب",
+    "fullname": "الاسم الكامل",
+    "fullname_placeholder": "أدخل اسمك الكامل",
+    "email": "البريد الإلكتروني",
+    "email_placeholder": "أدخل بريدك الإلكتروني",
+    "password": "كلمة المرور",
+    "password_placeholder": "أدخل كلمة المرور",
+    "confirm_password": "تأكيد كلمة المرور",
+    "confirm_password_placeholder": "أعد إدخال كلمة المرور",
+    "account_info": "معلومات الحساب",
+    "stadium_details": "تفاصيل الملعب",
+    "stadium_name": "اسم الملعب",
+    "stadium_name_placeholder": "مثال: ملعب النجوم",
+    "stadium_location": "الموقع",
+    "stadium_location_placeholder": "أدخل العنوان أو استخدم الخريطة",
+    "phone": "رقم هاتف للتواصل",
+    "phone_placeholder": "05XXXXXXXX",
+    "working_hours": "أوقات العمل",
+    "start_time": "بدأ من",
+    "end_time": "ينهي في",
+    "price_per_hour": "السعر/ساعة (دج)",
+    "price_per_hour_placeholder": "1000",
+    "capacity": "عدد اللاعبين",
+    "capacity_placeholder": "12",
+    "stadium_photo": "صورة الملعب",
+    "ownership_doc": "وثيقة إثبات الملكية",
+    "ownership_doc_placeholder": "تحميل وثيقة إثبات الملكية",
+    "photo_upload": "اسحب وأفلت أو انقر للتحميل",
+    "forgot_password": "هل نسيت كلمة المرور؟",
+    "no_account": "ليس لديك حساب؟",
+    "signup_now": "سجل الآن",
+    "already_account": "لديك حساب بالفعل؟",
+    "login_link": "تسجيل الدخول",
+    "submit_login": "تسجيل الدخول",
+    "submit_signup": "إنشاء حساب",
+    "submit_owner_signup": "إكمال التسجيل",
+    "or_login_with": "أو سجل الدخول باستخدام",
+    "back": "عودة",
+    "password_mismatch": "كلمة المرور غير متطابقة",
+    "error_generic": "حدث خطأ، يرجى المحاولة مجدداً",
+    "invalid_credentials": "خطأ في البريد الإلكتروني أو كلمة المرور"
+  },
+  "player": {
+    "location_prompt": "يرجى تفعيل الموقع الجغرافي لعرض الملاعب القريبة منك",
+    "tabs": {
+      "search_stadium": "البحث عن ملعب",
+      "search_opponent": "البحث عن خصم",
+      "rate_stadium": "تقييم ملعب"
+    },
+    "stadium": {
+      "nearby": "ملاعب قريبة منك",
+      "available_times": "الأوقات المتاحة",
+      "booked_times": "الأوقات المحجوزة",
+      "book_now": "حجز الآن",
+      "booking_confirmed": "تم الحجز بنجاح!"
+    },
+    "opponent": {
+      "available_opponents": "خصوم يبحثون عن فريق",
+      "join_match": "انضم إلى مباراة",
+      "create_match": "إنشاء مباراة جديدة",
+      "average_age": "معدل الأعمار",
+      "match_details": "تفاصيل المباراة",
+      "wait_for_opponent": "تم إنشاء المباراة!"
+    },
+    "rating": {
+      "title": "قيم تجربتك",
+      "lighting": "الإضاءة",
+      "pitch_quality": "جودة الأرضية",
+      "cleanliness": "النظافة",
+      "submit_rating": "حفظ التقييم",
+      "rating_saved": "شكراً لتقييمك!"
+    }
+  },
+  "owner": {
+    "dashboard_title": "لوحة تحكم الملعب",
+    "my_stadium": "ملعبي",
+    "statistics": "الإحصائيات والتقييمات",
+    "status_booked": "محجوز",
+    "status_available": "متاح"
+  },
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ ما",
+    "success": "تمت العملية بنجاح"
+  }
+}

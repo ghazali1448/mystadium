@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  role      String   // "player" or "owner"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  latitude  Float?
+  longitude Float?
+
+  // Relations
+  stadiums  Stadium[]
+  bookings  Booking[]
+  ratings   Rating[]
+  matchParticipations MatchParticipant[]
+  notifications Notification[]
+}
+
+model Stadium {
+  id           String   @id @default(uuid())
+  name         String
+  location     String
+  pricePerHour Float
+  capacity     Int
+  workingHours String
+  photoUrl     String?
+  ownershipDocUrl String?
+  ownerId      String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  latitude     Float?
+  longitude    Float?
+
+  // Relations
+  owner        User      @relation(fields: [ownerId], references: [id])
+  bookings     Booking[]
+  ratings      Rating[]
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  stadiumId String
+  userId    String
+  date      DateTime
+  slot      String
+  status    String   @default("confirmed") // "pending", "confirmed", "cancelled"
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  stadium   Stadium  @relation(fields: [stadiumId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  match     Match?
+}
+
+model Match {
+  id             String   @id @default(uuid())
+  bookingId      String   @unique
+  neededPlayers  Int
+  ageGroup       String
+  phone          String
+  status         String   @default("open") // "open", "closed"
+  createdAt      DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  booking        Booking  @relation(fields: [bookingId], references: [id])
+  participants   MatchParticipant[]
+}
+
+model MatchParticipant {
+  id        String   @id @default(uuid())
+  matchId   String
+  userId    String
+  createdAt DateTime @default(now())
+
+  // Relations
+  match     Match    @relation(fields: [matchId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([matchId, userId])
+}
+
+
+model Rating {
+  id           String   @id @default(uuid())
+  stadiumId    String
+  userId       String
+  lighting     Int
+  pitchQuality Int
+  cleanliness  Int
+  comment      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  stadium      Stadium  @relation(fields: [stadiumId], references: [id])
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String   // "booking_new", "booking_confirmed", "match_reminder", "rate_stadium", "discount", "rating_new"
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  // Optional meta data (JSON string or specific relations)
+  relatedId String?  // e.g., bookingId or stadiumId
+  
+  // Relations
+  user      User     @relation(fields: [userId], references: [id])
+}
