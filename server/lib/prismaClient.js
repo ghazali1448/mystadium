@@ -12,7 +12,7 @@ if (process.env.TURSO_AUTH_TOKEN && process.env.DATABASE_URL?.startsWith('libsql
     url: process.env.DATABASE_URL,
     authToken: process.env.TURSO_AUTH_TOKEN,
   });
-  const adapter = new PrismaLibSQL(libsql);
+  const adapter = new PrismaLibSQL({ client: libsql });
   prisma = globalForPrisma.prisma || new PrismaClient({ adapter });
 } else {
   prisma = globalForPrisma.prisma || new PrismaClient();
