@@ -1,0 +1,9 @@
+{
+  "appId": "com.mystadium.app",
+  "appName": "MyStadium",
+  "webDir": "dist",
+  "server": {
+    "cleartext": true,
+    "androidScheme": "https"
+  }
+}
