@@ -9,6 +9,7 @@ import OwnerDashboard from './pages/OwnerDashboard';
 
 function App() {
   const { i18n } = useTranslation();
+  // Build test comment
   const [currentPage, setCurrentPage] = useState('welcome');
   const [user, setUser] = useState(null);
   const [selectedRole, setSelectedRole] = useState('player');
