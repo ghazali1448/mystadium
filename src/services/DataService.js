@@ -57,8 +57,8 @@ class DataService {
       body: JSON.stringify({ userId, currentPassword, newPassword }),
     });
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Password update failed');
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Password update failed');
     }
     return await response.json();
   }
@@ -71,6 +71,16 @@ class DataService {
 
   async getStadiumByOwner(ownerId) {
     const response = await fetch(`${API_URL}/stadiums/owner/${ownerId}`);
+    return await response.json();
+  }
+
+  async updateStadium(stadiumId, data) {
+    const response = await fetch(`${API_URL}/stadiums`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: stadiumId, ...data }),
+    });
+    if (!response.ok) throw new Error('Failed to update stadium');
     return await response.json();
   }
 
@@ -173,9 +183,9 @@ class DataService {
   async getStadiumStats(stadiumId) {
     const response = await fetch(`${API_URL}/ratings/stadium/${stadiumId}`);
     const ratings = await response.json();
-    
+
     if (!ratings || ratings.length === 0) return { lighting: 0, pitch: 0, cleanliness: 0, count: 0 };
-    
+
     const totals = ratings.reduce((acc, r) => ({
       lighting: acc.lighting + r.lighting,
       pitch: acc.pitchQuality + r.pitchQuality,

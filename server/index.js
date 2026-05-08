@@ -9,6 +9,7 @@ import bookingRoutes from './routes/bookingRoutes.js';
 import matchRoutes from './routes/matchRoutes.js';
 import ratingRoutes from './routes/ratingRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js';
 import prisma from './lib/prismaClient.js';
 import { startRatingCronJob } from './cron/ratingJob.js';
 
@@ -25,6 +26,9 @@ app.use(cors({
     'http://localhost:5173',
     'http://localhost:5000',
     'https://mystadium.vercel.app',
+    'http://localhost',
+    'https://localhost',
+    'capacitor://localhost',
     process.env.FRONTEND_URL,
     /\.vercel\.app$/
   ].filter(Boolean),
@@ -44,6 +48,8 @@ app.use('/api/bookings', bookingRoutes);
 app.use('/api/matches', matchRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/upload', uploadRoutes);
+app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
 // Serve Static Frontend in Production
 // Assuming 'dist' is at the root level (one level up from 'server')

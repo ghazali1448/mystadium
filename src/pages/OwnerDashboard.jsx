@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import DataService from '../services/DataService';
 import NotificationsScreen from '../components/NotificationsScreen';
+import ImageUpload from '../components/common/ImageUpload';
+import { Settings, Save } from 'lucide-react';
 
 /* ─── Constants & Styles ─── */
 const GREEN = '#10B981';
@@ -95,7 +97,7 @@ const DashboardHome = ({ user, isRtl, t, stadium, stats, bookings, onAcceptBooki
       <h2 style={{ fontSize: 16, fontWeight: 800, color: DARK, margin: '0 0 16px', textAlign: isRtl ? 'right' : 'left' }}>{isRtl ? 'أداء الملاعب' : 'Stadium Performance'}</h2>
       <div style={{ backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
         <div style={{ width: '100%', height: 120, borderRadius: 14, overflow: 'hidden', position: 'relative', marginBottom: 16 }}>
-          <img src="/stadium-bg.jpg" alt="Stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.style.backgroundColor='#1a2744'; }} />
+          <img src={stadium?.photoUrl || '/stadium-bg.jpg'} alt="Stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.style.backgroundColor='#1a2744'; }} />
           <div style={{ position: 'absolute', bottom: 12, right: isRtl ? 12 : 'auto', left: isRtl ? 'auto' : 12, color: 'white', textAlign: isRtl ? 'right' : 'left' }}>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{stadium?.name || (isRtl ? 'الاستاد الدولي' : 'International Stadium')}</h3>
             <p style={{ margin: 0, fontSize: 11, fontWeight: 600, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{stadium?.location || 'حي الشقيق، الرياض'}</p>
@@ -234,6 +236,181 @@ const RatingsReviewsScreen = ({ isRtl, stats }) => {
   );
 };
 
+const StadiumSettings = ({ isRtl, stadium, onUpdate }) => {
+  const [formData, setFormData] = useState({
+    name: stadium?.name || '',
+    location: stadium?.location || '',
+    pricePerHour: stadium?.pricePerHour || 0,
+    capacity: stadium?.capacity || 0,
+    workingHours: stadium?.workingHours || '08:00 - 22:00',
+    photoUrl: stadium?.photoUrl || '',
+    ownershipDocUrl: stadium?.ownershipDocUrl || ''
+  });
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveSuccess(false);
+    try {
+      await onUpdate(formData);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inputStyle = {
+    width: '100%', padding: '12px 16px', borderRadius: 12,
+    border: '1px solid #E5E7EB', fontFamily: FONT, fontSize: 14,
+    outline: 'none', transition: 'border-color 0.2s',
+    boxSizing: 'border-box',
+    textAlign: isRtl ? 'right' : 'left',
+  };
+
+  const labelStyle = {
+    fontSize: 13, fontWeight: 700, color: DARK,
+    display: 'block', marginBottom: 8,
+    textAlign: isRtl ? 'right' : 'left',
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: '20px 20px 100px' }}>
+      {/* Upload status badges */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+        {[
+          { key: 'photoUrl', label: isRtl ? 'صورة الملعب' : 'Photo', icon: '📸' },
+          { key: 'ownershipDocUrl', label: isRtl ? 'وثيقة الملكية' : 'Doc', icon: '📄' },
+        ].map(item => (
+          <div key={item.key} style={{
+            padding: '6px 14px', borderRadius: 20,
+            backgroundColor: formData[item.key] ? '#ECFDF5' : '#FEF2F2',
+            color: formData[item.key] ? '#059669' : '#DC2626',
+            fontSize: 11, fontWeight: 700,
+            display: 'flex', alignItems: 'center', gap: 6,
+          }}>
+            <span>{item.icon}</span>
+            {item.label}: {formData[item.key] ? (isRtl ? 'مرفوع ✓' : 'Uploaded ✓') : (isRtl ? 'غير مرفوع' : 'Missing')}
+          </div>
+        ))}
+      </div>
+
+      {/* Photo upload card */}
+      <div style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', marginBottom: 16 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: DARK, marginBottom: 16, textAlign: isRtl ? 'right' : 'left' }}>
+          {isRtl ? '📸 صور الملعب' : '📸 Stadium Photos'}
+        </h2>
+        <ImageUpload 
+          label={isRtl ? 'صورة الملعب الرئيسية' : 'Main Stadium Photo'} 
+          initialUrl={formData.photoUrl}
+          category="stadiums"
+          isRtl={isRtl}
+          onUploadComplete={(url) => setFormData(prev => ({ ...prev, photoUrl: url }))}
+        />
+      </div>
+
+      {/* Document upload card */}
+      <div style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', marginBottom: 16 }}>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: DARK, marginBottom: 16, textAlign: isRtl ? 'right' : 'left' }}>
+          {isRtl ? '📄 وثيقة الملكية' : '📄 Ownership Document'}
+        </h2>
+        <ImageUpload 
+          label={isRtl ? 'ارفع وثيقة الملكية (PDF/صورة)' : 'Upload ownership document (PDF/Image)'} 
+          initialUrl={formData.ownershipDocUrl}
+          category="documents"
+          isRtl={isRtl}
+          onUploadComplete={(url) => setFormData(prev => ({ ...prev, ownershipDocUrl: url }))}
+        />
+      </div>
+
+      {/* Stadium info form */}
+      <div style={{ backgroundColor: 'white', borderRadius: 24, padding: 24, boxShadow: '0 4px 20px rgba(0,0,0,0.05)' }}>
+        <h2 style={{ fontSize: 16, fontWeight: 800, color: DARK, marginBottom: 20, textAlign: isRtl ? 'right' : 'left' }}>
+          {isRtl ? '⚙️ معلومات الملعب' : '⚙️ Stadium Information'}
+        </h2>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div>
+            <label style={labelStyle}>{isRtl ? 'اسم الملعب' : 'Stadium Name'}</label>
+            <input 
+              value={formData.name} 
+              onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
+              placeholder={isRtl ? 'مثال: ملعب النجوم' : 'e.g. Stars Stadium'}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>{isRtl ? 'الموقع / العنوان' : 'Location / Address'}</label>
+            <input 
+              value={formData.location} 
+              onChange={e => setFormData(prev => ({ ...prev, location: e.target.value }))}
+              placeholder={isRtl ? 'مثال: حي النور، الجزائر' : 'e.g. El Nour, Algiers'}
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>{isRtl ? 'ساعات العمل' : 'Working Hours'}</label>
+            <input 
+              value={formData.workingHours} 
+              onChange={e => setFormData(prev => ({ ...prev, workingHours: e.target.value }))}
+              placeholder="08:00 - 22:00"
+              style={inputStyle}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>{isRtl ? 'السعر/ساعة (د.ج)' : 'Price/Hour (DZD)'}</label>
+              <input 
+                type="number"
+                value={formData.pricePerHour} 
+                onChange={e => setFormData(prev => ({ ...prev, pricePerHour: parseFloat(e.target.value) || 0 }))}
+                style={inputStyle}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={labelStyle}>{isRtl ? 'السعة (لاعبين)' : 'Capacity (players)'}</label>
+              <input 
+                type="number"
+                value={formData.capacity} 
+                onChange={e => setFormData(prev => ({ ...prev, capacity: parseInt(e.target.value) || 0 }))}
+                style={inputStyle}
+              />
+            </div>
+          </div>
+
+          {/* Save button */}
+          <button 
+            onClick={handleSave}
+            disabled={saving}
+            style={{ 
+              marginTop: 10, width: '100%', padding: 16, 
+              backgroundColor: saveSuccess ? '#059669' : GREEN, 
+              color: 'white', border: 'none', borderRadius: 16, 
+              fontWeight: 800, cursor: saving ? 'default' : 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              opacity: saving ? 0.7 : 1,
+              transition: 'all 0.3s',
+              fontFamily: FONT, fontSize: 15,
+            }}
+          >
+            {saving ? (
+              <>{isRtl ? 'جاري الحفظ...' : 'Saving...'}</>
+            ) : saveSuccess ? (
+              <>{isRtl ? '✓ تم الحفظ بنجاح' : '✓ Saved Successfully'}</>
+            ) : (
+              <><Save size={18} /> {isRtl ? 'حفظ التغييرات' : 'Save Changes'}</>
+            )}
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
 /* ─── Main OwnerDashboard Component ─── */
 const OwnerDashboard = ({ user, onLogout }) => {
   const { t, i18n } = useTranslation();
@@ -276,6 +453,15 @@ const OwnerDashboard = ({ user, onLogout }) => {
       await DataService.updateBookingStatus(bookingId, 'rejected');
       setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'rejected' } : b));
     } catch (err) {}
+  };
+
+  const handleUpdateStadium = async (data) => {
+    try {
+      const updated = await DataService.updateStadium(stadium.id, { ownerId: user.id, ...data });
+      setStadium(updated);
+    } catch (err) {
+      throw err; // Let StadiumSettings catch it
+    }
   };
 
   return (
@@ -322,6 +508,7 @@ const OwnerDashboard = ({ user, onLogout }) => {
           )}
           {tab === 'dashboard' && <DashboardHome key="dash" user={user} isRtl={isRtl} t={t} stadium={stadium} stats={stats} bookings={bookings} onAcceptBooking={handleAccept} onRejectBooking={handleReject} />}
           {tab === 'ratings' && <RatingsReviewsScreen key="rate" isRtl={isRtl} stats={stats} />}
+          {tab === 'settings' && <StadiumSettings key="settings" isRtl={isRtl} stadium={stadium} onUpdate={handleUpdateStadium} />}
           {tab === 'profile' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: 40, textAlign: 'center' }}>
                <div style={{ width: 100, height: 100, borderRadius: 50, backgroundColor: LIGHT_GREEN, margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 40 }}>🧑</div>
@@ -345,6 +532,7 @@ const OwnerDashboard = ({ user, onLogout }) => {
         }}>
           {[
             { id: 'profile', icon: '👤', label: isRtl ? 'حسابي' : 'PROFILE' },
+            { id: 'settings', icon: '⚙️', label: isRtl ? 'الإعدادات' : 'SETTINGS' },
             { id: 'notifications', icon: '🔔', label: isRtl ? 'تنبيهات' : 'ALERTS' },
             { id: 'ratings', icon: '⭐', label: isRtl ? 'تقييمات' : 'REVIEWS' },
             { id: 'dashboard', icon: '📊', label: isRtl ? 'الرئيسية' : 'DASHBOARD' },
