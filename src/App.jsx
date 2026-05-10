@@ -6,6 +6,8 @@ import RoleSelectScreen from './pages/RoleSelectScreen';
 import AuthScreen from './pages/AuthScreen';
 import PlayerDashboard from './pages/PlayerDashboard';
 import OwnerDashboard from './pages/OwnerDashboard';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   const { i18n } = useTranslation();
@@ -13,6 +15,19 @@ function App() {
   const [currentPage, setCurrentPage] = useState('welcome');
   const [user, setUser] = useState(null);
   const [selectedRole, setSelectedRole] = useState('player');
+  const [resetToken, setResetToken] = useState(null);
+
+  // Check for reset token in URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    if (token) {
+      setResetToken(token);
+      setCurrentPage('reset_password');
+      // Clear URL params without refreshing to keep it clean
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   // Inject Cairo font once
   useEffect(() => {
@@ -74,6 +89,23 @@ function App() {
           onAuthSuccess={handleLogin}
           onSwitchToLogin={() => setCurrentPage('auth_login')}
           onSwitchToSignup={() => setCurrentPage('role_select')}
+          onForgotPassword={() => setCurrentPage('forgot_password')}
+        />
+      )}
+
+      {/* Forgot Password */}
+      {currentPage === 'forgot_password' && (
+        <ForgotPassword onBack={() => setCurrentPage('auth_login')} />
+      )}
+
+      {/* Reset Password */}
+      {currentPage === 'reset_password' && (
+        <ResetPassword 
+          token={resetToken} 
+          onBack={() => {
+            setResetToken(null);
+            setCurrentPage('auth_login');
+          }} 
         />
       )}
 
@@ -86,6 +118,7 @@ function App() {
           onAuthSuccess={handleLogin}
           onSwitchToLogin={() => setCurrentPage('auth_login')}
           onSwitchToSignup={() => setCurrentPage('role_select')}
+          onForgotPassword={() => setCurrentPage('forgot_password')}
         />
       )}
 

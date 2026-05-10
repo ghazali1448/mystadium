@@ -1,4 +1,5 @@
 import prisma from '../lib/prismaClient.js';
+import crypto from 'crypto';
 
 export const createBooking = async (req, res) => {
   try {
@@ -10,7 +11,7 @@ export const createBooking = async (req, res) => {
         stadiumId,
         date: new Date(date),
         slot: slot,
-        status: { not: 'cancelled' }
+        status: { notIn: ['cancelled', 'rejected'] }
       }
     });
 
@@ -18,12 +19,17 @@ export const createBooking = async (req, res) => {
       return res.status(400).json({ message: 'This slot is already booked' });
     }
 
+    // Generate secure unique QR token
+    const qrToken = crypto.randomBytes(16).toString('hex');
+
     const booking = await prisma.booking.create({
       data: {
         stadiumId,
         userId,
         slot: slot,
-        date: new Date(date)
+        date: new Date(date),
+        qrToken,
+        status: 'ready_for_checkin' // Defaulting to ready for check-in since it's confirmed
       }
     });
 
@@ -109,7 +115,8 @@ export const updateBookingStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     
-    if (!['confirmed', 'rejected', 'cancelled'].includes(status)) {
+    const validStatuses = ['confirmed', 'rejected', 'cancelled', 'ready_for_checkin', 'paid', 'no_show', 'expired'];
+    if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: 'Invalid status' });
     }
 

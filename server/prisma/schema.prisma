@@ -27,6 +27,11 @@ model User {
   ratings   Rating[]
   matchParticipations MatchParticipant[]
   notifications Notification[]
+  reliabilityScore Float? @default(100.0)
+  
+  // Password Reset
+  resetPasswordToken   String?
+  resetPasswordExpires DateTime?
 }
 
 model Stadium {
@@ -59,9 +64,16 @@ model Booking {
   userId    String
   date      DateTime
   slot      String
-  status    String   @default("confirmed") // "pending", "confirmed", "cancelled", "rejected"
+  status    String   @default("confirmed") // "pending", "confirmed", "cancelled", "rejected", "ready_for_checkin", "paid", "no_show", "expired"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // QR & Validation
+  qrToken        String?  @unique
+  paymentStatus  String?  @default("UNPAID")
+  validatedAt    DateTime?
+  checkInTime    DateTime?
+  receiptData    Json?
 
   // Relations
   stadium   Stadium  @relation(fields: [stadiumId], references: [id])
@@ -71,6 +83,7 @@ model Booking {
   // Indexes for performance
   @@index([stadiumId])
   @@index([userId])
+  @@index([qrToken])
 }
 
 model Match {

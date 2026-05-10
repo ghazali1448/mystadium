@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import DataService from '../services/DataService';
 import NotificationsScreen from '../components/NotificationsScreen';
+import { getImageUrl } from '../utils/imageUrl';
+import { QRCodeCanvas } from 'qrcode.react';
+import { Receipt } from 'lucide-react';
 
 /* ─── Icons ─── */
 const HomeIcon = ({ active }) => (
@@ -701,7 +704,7 @@ const StadiumList = ({ stadiums, onSelect, isRtl, t }) => {
       style={{ backgroundColor: 'white', borderRadius: 24, padding: '0', marginBottom: 20, boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden', border: '1px solid #F3F4F6', cursor: 'pointer' }}>
       
       <div style={{ position: 'relative', height: 180 }}>
-        <img src={s.photoUrl || (s.name.includes('المدينة') ? '/stadium-red.jpg' : '/stadium-green.jpg')} alt="stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.src = '/stadium-bg.jpg'; }} />
+        <img src={getImageUrl(s.photoUrl)} alt="stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.src = '/stadium-bg.jpg'; }} />
         <div style={{ position: 'absolute', top: 12, right: 12, backgroundColor: '#065F46', color: 'white', padding: '6px 12px', borderRadius: 10, fontSize: 12, fontWeight: 700 }}>
           {s.pricePerHour} {isRtl ? 'د.ج / ساعة' : 'DZD / hr'}
         </div>
@@ -794,7 +797,7 @@ const StadiumDetail = ({ stadium, onBook, isRtl, t, allConfirmedBookings = [] })
       {/* Hero Image */}
       <div style={{ position: 'relative', height: 300, overflow: 'hidden' }}>
         <img 
-          src={stadium.photoUrl || '/stadium-bg.jpg'} 
+          src={getImageUrl(stadium.photoUrl)} 
           style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
           onError={e => { e.target.src = '/stadium-bg.jpg'; }}
         />
@@ -958,7 +961,7 @@ const CreateMatchScreen = ({ isRtl, t, stadiums, onBack, onConfirm, allConfirmed
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ paddingBottom: 120, backgroundColor: BG, minHeight: '100vh', direction: isRtl ? 'rtl' : 'ltr' }}>
         <div style={{ position: 'relative', height: 280, overflow: 'hidden' }}>
-            <img src={selectedStadium?.photoUrl || '/stadium-bg.jpg'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={getImageUrl(selectedStadium?.photoUrl)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 30%, rgba(0,0,0,0.8) 100%)' }} />
             
             <div style={{ position: 'absolute', top: 52, left: 20, right: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1169,7 +1172,7 @@ const OpponentView = ({ openMatches, onJoin, stadiums, userId, isRtl, t, onCreat
             {stadiums.map(s => (
               <div key={s.id} style={{ backgroundColor: 'white', borderRadius: 32, marginBottom: 24, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', border: '1px solid #F3F4F6' }}>
                 <div style={{ position: 'relative', height: 180 }}>
-                    <img src={s.photoUrl || '/stadium-bg.jpg'} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={getImageUrl(s.photoUrl)} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     {s.distance && (
                       <div style={{ position: 'absolute', top: 12, right: isRtl ? 'auto' : 12, left: isRtl ? 12 : 'auto', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '6px 12px', borderRadius: 10, fontSize: 11, fontWeight: 700, backdropFilter: 'blur(4px)' }}>
                         📍 {s.distance.toFixed(1)} km
@@ -1314,16 +1317,31 @@ const ProfileScreen = ({ user, isRtl, t, onLogout, onEditProfile, onSecurity, bo
 
        {/* Activity Summary */}
        <h3 style={{ margin: '0 0 16px', fontSize: 16, fontWeight: 800, color: DARK, textAlign: isRtl ? 'right' : 'left' }}>{isRtl ? 'ملخص النشاط' : 'Activity Summary'}</h3>
-       <div style={{ backgroundColor: 'white', borderRadius: 20, padding: 20, marginBottom: 32, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <span style={{ padding: '6px 12px', backgroundColor: LIGHT_GREEN, color: GREEN, borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
-             {bookingsCount > 0 ? (isRtl ? 'نشط جداً' : 'Very Active') : (isRtl ? 'جديد' : 'New User')}
-          </span>
-          <div style={{ textAlign: isRtl ? 'left' : 'right', display: 'flex', alignItems: 'center', gap: 16 }}>
-             <div>
-                <p style={{ margin: '0 0 2px', fontSize: 13, color: GREY }}>{isRtl ? 'إجمالي الحجوزات' : 'Total Bookings'}</p>
-                <p style={{ margin: 0, fontSize: 24, fontWeight: 800, color: DARK }}>{bookingsCount}</p>
-             </div>
-             <div style={{ width: 44, height: 44, backgroundColor: '#F3F4F6', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📅</div>
+       <div style={{ backgroundColor: 'white', borderRadius: 20, padding: 20, marginBottom: 32, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ padding: '6px 12px', backgroundColor: LIGHT_GREEN, color: GREEN, borderRadius: 20, fontSize: 13, fontWeight: 700 }}>
+               {bookingsCount > 0 ? (isRtl ? 'نشط جداً' : 'Very Active') : (isRtl ? 'جديد' : 'New User')}
+            </span>
+            <div style={{ textAlign: isRtl ? 'left' : 'right', display: 'flex', alignItems: 'center', gap: 16 }}>
+               <div>
+                  <p style={{ margin: '0 0 2px', fontSize: 13, color: GREY }}>{isRtl ? 'إجمالي الحجوزات' : 'Total Bookings'}</p>
+                  <p style={{ margin: 0, fontSize: 24, fontWeight: 800, color: DARK }}>{bookingsCount}</p>
+               </div>
+               <div style={{ width: 44, height: 44, backgroundColor: '#F3F4F6', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>📅</div>
+            </div>
+          </div>
+          
+          <div style={{ height: 1, backgroundColor: '#F3F4F6' }} />
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
+              <p style={{ margin: '0 0 2px', fontSize: 13, color: GREY }}>{isRtl ? 'درجة الموثوقية' : 'Reliability Score'}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 18, fontWeight: 900, color: (user.reliabilityScore || 100) >= 80 ? GREEN : '#F59E0B' }}>{user.reliabilityScore || 100}%</span>
+                <span style={{ fontSize: 14 }}>⭐</span>
+              </div>
+            </div>
+            <div style={{ width: 44, height: 44, backgroundColor: '#FFFBEB', borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>🛡️</div>
           </div>
        </div>
 
@@ -1515,6 +1533,9 @@ const inputStyle = { width: '100%', padding: '12px 14px', border: '1.5px solid #
 
 /* ─── Bookings Screen ─── */
 const BookingsScreen = ({ isRtl, onBack, bookings }) => {
+  const [viewingQr, setViewingQr] = useState(null);
+  const [viewingReceipt, setViewingReceipt] = useState(null);
+
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ padding: '0 20px 100px', direction: isRtl ? 'rtl' : 'ltr', flex: 1, overflowY: 'auto' }}>
       {/* Header */}
@@ -1535,41 +1556,159 @@ const BookingsScreen = ({ isRtl, onBack, bookings }) => {
         </div>
       ) : (
         bookings.map(b => (
-          <div key={b.id} style={{ backgroundColor: 'white', borderRadius: 20, marginBottom: 20, boxShadow: '0 2px 12px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
+          <div key={b.id} style={{ backgroundColor: 'white', borderRadius: 24, marginBottom: 20, boxShadow: '0 8px 25px rgba(0,0,0,0.04)', overflow: 'hidden', border: '1px solid #F3F4F6' }}>
              {/* Card Image */}
-             <div style={{ width: '100%', height: 110, position: 'relative' }}>
-                <img src="/stadium-bg.jpg" alt="stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.style.backgroundColor='#1a2744'; }} />
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.4) 100%)' }} />
-                <div style={{ position: 'absolute', top: 12, right: isRtl ? 12 : 'auto', left: isRtl ? 'auto' : 12, padding: '4px 12px', backgroundColor: 'rgba(255,255,255,0.9)', color: GREEN, borderRadius: 20, fontSize: 11, fontWeight: 800, boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                   {isRtl ? 'حجز مباشر' : 'Direct Booking'}
+             <div style={{ width: '100%', height: 120, position: 'relative' }}>
+                <img src={getImageUrl(b.stadium?.photoUrl)} alt="stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.src = '/stadium-bg.jpg'; }} />
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(0,0,0,0) 50%, rgba(0,0,0,0.6) 100%)' }} />
+                <div style={{ position: 'absolute', top: 12, right: isRtl ? 12 : 'auto', left: isRtl ? 'auto' : 12, padding: '6px 14px', backgroundColor: 'rgba(255,255,255,0.95)', color: GREEN, borderRadius: 12, fontSize: 11, fontWeight: 800, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+                   {b.matchId ? (isRtl ? 'مباراة عامة' : 'Matchmaking') : (isRtl ? 'حجز مباشر' : 'Direct Booking')}
                 </div>
              </div>
 
-             <div style={{ padding: 16 }}>
+             <div style={{ padding: 20 }}>
                 {/* Header Info */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                    <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
-                      <h3 style={{ margin: '0 0 6px', fontSize: 16, fontWeight: 800, color: DARK }}>الملعب {b.stadiumId}</h3>
-                      <p style={{ margin: 0, fontSize: 12, color: GREY, display: 'flex', alignItems: 'center', gap: 4 }}>📍 الموقع المحدد</p>
+                      <h3 style={{ margin: '0 0 4px', fontSize: 18, fontWeight: 900, color: DARK }}>{b.stadium?.name || (isRtl ? 'ملعب غير مسمى' : 'Unnamed Stadium')}</h3>
+                      <p style={{ margin: 0, fontSize: 12, color: GREY, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <LocationPinIcon /> {b.stadium?.location || '...'}
+                      </p>
                    </div>
-                   <div style={{ padding: '4px 14px', backgroundColor: LIGHT_GREEN, color: GREEN, borderRadius: 12, fontSize: 11, fontWeight: 800 }}>
-                      {b.status === 'confirmed' ? (isRtl ? 'مؤكد' : 'Confirmed') : b.status}
+                   <div style={{ 
+                      padding: '6px 14px', 
+                      backgroundColor: b.status === 'paid' ? '#DCFCE7' : b.status === 'ready_for_checkin' ? '#FEF3C7' : '#F3F4F6', 
+                      color: b.status === 'paid' ? '#059669' : b.status === 'ready_for_checkin' ? '#D97706' : GREY, 
+                      borderRadius: 12, fontSize: 11, fontWeight: 900, textTransform: 'uppercase'
+                    }}>
+                      {b.status === 'paid' ? (isRtl ? 'مدفوع' : 'PAID') : 
+                       b.status === 'ready_for_checkin' ? (isRtl ? 'جاهز للدخول' : 'READY') :
+                       b.status === 'confirmed' ? (isRtl ? 'مؤكد' : 'CONFIRMED') : b.status}
                    </div>
                 </div>
                 
                 <div style={{ height: 1, backgroundColor: '#F3F4F6', marginBottom: 16 }} />
 
-                {/* Date & Price */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 20 }}>
+                {/* Date & Time Row */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
                    <div style={{ textAlign: isRtl ? 'right' : 'left' }}>
-                      <p style={{ margin: '0 0 4px', fontSize: 10, color: GREY }}>{isRtl ? 'التاريخ والوقت' : 'Date & Time'}</p>
-                      <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: DARK, display: 'flex', alignItems: 'center', gap: 6, direction: isRtl ? 'rtl' : 'ltr' }}>📅 {b.date} | {b.slot}</p>
+                      <p style={{ margin: '0 0 4px', fontSize: 10, color: GREY, fontWeight: 700 }}>{isRtl ? 'التاريخ والوقت' : 'DATE & TIME'}</p>
+                      <p style={{ margin: 0, fontSize: 13, fontWeight: 800, color: DARK, display: 'flex', alignItems: 'center', gap: 8, direction: 'ltr' }}>
+                        📅 {b.date.split('T')[0]} | {b.slot}
+                      </p>
                    </div>
+                   {b.status === 'paid' && b.receiptData && (
+                      <button onClick={() => setViewingReceipt(b.receiptData)} style={{ background: '#F0F9FF', color: '#0284C7', border: 'none', padding: '10px 14px', borderRadius: 12, fontSize: 12, fontWeight: 800, display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+                        <Receipt size={14} /> {isRtl ? 'الإيصال' : 'RECEIPT'}
+                      </button>
+                   )}
                 </div>
+
+                {/* QR Code Trigger */}
+                {(b.status === 'confirmed' || b.status === 'ready_for_checkin' || b.status === 'paid') && (
+                  <button 
+                    onClick={() => setViewingQr(b)}
+                    style={{ 
+                      width: '100%', 
+                      padding: '16px', 
+                      backgroundColor: b.status === 'paid' ? '#F3F4F6' : DARK, 
+                      color: b.status === 'paid' ? GREY : 'white', 
+                      border: 'none', 
+                      borderRadius: 16, 
+                      fontSize: 14, 
+                      fontWeight: 800, 
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 12
+                    }}
+                  >
+                    <span>{isRtl ? 'عرض رمز الدخول QR' : 'VIEW ENTRY QR'}</span>
+                    <span style={{ fontSize: 18 }}>🎫</span>
+                  </button>
+                )}
              </div>
           </div>
         ))
       )}
+
+      {/* QR Modal Overlay */}
+      <AnimatePresence>
+        {viewingQr && (
+          <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            onClick={() => setViewingQr(null)}
+          >
+            <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              style={{ backgroundColor: 'white', borderRadius: 32, width: '100%', maxWidth: 360, padding: 32, textAlign: 'center' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <h2 style={{ fontSize: 22, fontWeight: 900, color: DARK, marginBottom: 8 }}>{isRtl ? 'رمز الدخول' : 'Entry Code'}</h2>
+              <p style={{ fontSize: 14, color: GREY, marginBottom: 24 }}>{isRtl ? 'أبرز هذا الرمز للمسؤول عند الوصول' : 'Show this to the agent upon arrival'}</p>
+              
+              <div style={{ backgroundColor: 'white', padding: 16, borderRadius: 24, boxShadow: '0 10px 40px rgba(0,0,0,0.1)', display: 'inline-block', marginBottom: 24 }}>
+                <QRCodeCanvas value={viewingQr.qrToken} size={220} level="H" />
+              </div>
+
+              <div style={{ textAlign: isRtl ? 'right' : 'left', backgroundColor: '#F9FAFB', padding: 16, borderRadius: 16, marginBottom: 24 }}>
+                <p style={{ margin: '0 0 4px', fontSize: 11, color: GREY }}>{isRtl ? 'معلومات الحجز' : 'Booking Info'}</p>
+                <p style={{ margin: '0 0 2px', fontSize: 15, fontWeight: 800 }}>{viewingQr.stadium?.name}</p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: GREEN }}>{viewingQr.date.split('T')[0]} @ {viewingQr.slot}</p>
+              </div>
+
+              <button onClick={() => setViewingQr(null)} style={{ width: '100%', padding: '16px', backgroundColor: '#F3F4F6', color: DARK, border: 'none', borderRadius: 16, fontWeight: 800, cursor: 'pointer' }}>
+                {isRtl ? 'إغلاق' : 'Close'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {viewingReceipt && (
+           <motion.div 
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}
+            onClick={() => setViewingReceipt(null)}
+          >
+             <motion.div 
+              initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 20 }}
+              style={{ backgroundColor: 'white', borderRadius: 32, width: '100%', maxWidth: 360, padding: 32, textAlign: 'center', border: '2px dashed #E5E7EB' }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div style={{ width: 60, height: 60, backgroundColor: LIGHT_GREEN, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', color: GREEN, fontSize: 30 }}>🧾</div>
+              <h2 style={{ fontSize: 22, fontWeight: 900, color: DARK, marginBottom: 4 }}>{isRtl ? 'إيصال الدفع الرقمي' : 'Digital Receipt'}</h2>
+              <p style={{ fontSize: 12, color: GREEN, fontWeight: 700, marginBottom: 24 }}>{viewingReceipt.receiptId}</p>
+
+              <div style={{ textAlign: 'right', marginBottom: 24 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800 }}>{viewingReceipt.amount} {viewingReceipt.currency}</span>
+                  <span style={{ fontSize: 14, color: GREY }}>{isRtl ? 'المبلغ المدفوع' : 'Amount Paid'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800 }}>{viewingReceipt.stadiumName}</span>
+                  <span style={{ fontSize: 14, color: GREY }}>{isRtl ? 'الملعب' : 'Stadium'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <span style={{ fontSize: 14, fontWeight: 800 }}>{viewingReceipt.date.split('T')[0]}</span>
+                  <span style={{ fontSize: 14, color: GREY }}>{isRtl ? 'التاريخ' : 'Date'}</span>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: '#F9FAFB', padding: 16, borderRadius: 16, marginBottom: 24 }}>
+                <p style={{ margin: 0, fontSize: 12, color: GREY, lineHeight: 1.5 }}>
+                  {isRtl ? 'شكراً لتعاملك مع MyStadium. هذا الإيصال يؤكد عملية الدفع نقداً لمسؤول الملعب.' : 'Thank you for using MyStadium. This receipt confirms the cash payment made to the agent.'}
+                </p>
+              </div>
+
+              <button onClick={() => setViewingReceipt(null)} style={{ width: '100%', padding: '16px', backgroundColor: GREEN, color: 'white', border: 'none', borderRadius: 16, fontWeight: 800, cursor: 'pointer' }}>
+                {isRtl ? 'موافق' : 'Done'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };

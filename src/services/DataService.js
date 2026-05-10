@@ -75,12 +75,18 @@ class DataService {
   }
 
   async updateStadium(stadiumId, data) {
+    const body = { ...data };
+    if (stadiumId) body.id = stadiumId;
+    
     const response = await fetch(`${API_URL}/stadiums`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: stadiumId, ...data }),
+      body: JSON.stringify(body),
     });
-    if (!response.ok) throw new Error('Failed to update stadium');
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.message || 'Failed to update stadium');
+    }
     return await response.json();
   }
 
@@ -146,6 +152,29 @@ class DataService {
     return await response.json();
   }
 
+  // --- QR Validation & Payments ---
+  async scanBooking(qrToken) {
+    const response = await fetch(`${API_URL}/validation/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ qrToken }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Scanning failed');
+    return data;
+  }
+
+  async confirmPayment(bookingId) {
+    const response = await fetch(`${API_URL}/validation/confirm-payment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ bookingId }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Payment confirmation failed');
+    return data;
+  }
+
   // --- Matches (Matchmaking) ---
   async createMatch(bookingId, needed, ageGroup, phone) {
     const response = await fetch(`${API_URL}/matches`, {
@@ -208,6 +237,36 @@ class DataService {
       body: JSON.stringify({ userId, latitude, longitude }),
     });
     return await response.json();
+  }
+
+  // --- Password Reset ---
+  async requestPasswordReset(email) {
+    const response = await fetch(`${API_URL}/password/request-reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to request reset');
+    return data;
+  }
+
+  async verifyResetToken(token) {
+    const response = await fetch(`${API_URL}/password/verify-token/${token}`);
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Invalid or expired token');
+    return data;
+  }
+
+  async resetPassword(token, newPassword) {
+    const response = await fetch(`${API_URL}/password/reset`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token, newPassword }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to reset password');
+    return data;
   }
 }
 

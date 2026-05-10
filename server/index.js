@@ -10,8 +10,11 @@ import matchRoutes from './routes/matchRoutes.js';
 import ratingRoutes from './routes/ratingRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
+import validationRoutes from './routes/validationRoutes.js';
+import passwordRoutes from './routes/passwordRoutes.js';
 import prisma from './lib/prismaClient.js';
 import { startRatingCronJob } from './cron/ratingJob.js';
+import { startBookingCleanupJob } from './cron/bookingCleanupJob.js';
 
 dotenv.config();
 
@@ -49,6 +52,8 @@ app.use('/api/matches', matchRoutes);
 app.use('/api/ratings', ratingRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/validation', validationRoutes);
+app.use('/api/password', passwordRoutes);
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 
 // Serve Static Frontend in Production
@@ -73,6 +78,7 @@ async function startServer() {
     
     // Start background jobs
     startRatingCronJob();
+    startBookingCleanupJob();
 
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

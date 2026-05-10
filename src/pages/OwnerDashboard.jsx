@@ -4,7 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import DataService from '../services/DataService';
 import NotificationsScreen from '../components/NotificationsScreen';
 import ImageUpload from '../components/common/ImageUpload';
-import { Settings, Save } from 'lucide-react';
+import { getImageUrl } from '../utils/imageUrl';
+import { Settings, Save, Scan } from 'lucide-react';
+import QrScanner from '../components/owner/QrScanner';
 
 /* ─── Constants & Styles ─── */
 const GREEN = '#10B981';
@@ -97,7 +99,7 @@ const DashboardHome = ({ user, isRtl, t, stadium, stats, bookings, onAcceptBooki
       <h2 style={{ fontSize: 16, fontWeight: 800, color: DARK, margin: '0 0 16px', textAlign: isRtl ? 'right' : 'left' }}>{isRtl ? 'أداء الملاعب' : 'Stadium Performance'}</h2>
       <div style={{ backgroundColor: 'white', borderRadius: 20, padding: 16, marginBottom: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
         <div style={{ width: '100%', height: 120, borderRadius: 14, overflow: 'hidden', position: 'relative', marginBottom: 16 }}>
-          <img src={stadium?.photoUrl || '/stadium-bg.jpg'} alt="Stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.style.backgroundColor='#1a2744'; }} />
+          <img src={getImageUrl(stadium?.photoUrl)} alt="Stadium" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { e.target.style.display='none'; e.target.parentNode.style.backgroundColor='#1a2744'; }} />
           <div style={{ position: 'absolute', bottom: 12, right: isRtl ? 12 : 'auto', left: isRtl ? 'auto' : 12, color: 'white', textAlign: isRtl ? 'right' : 'left' }}>
             <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{stadium?.name || (isRtl ? 'الاستاد الدولي' : 'International Stadium')}</h3>
             <p style={{ margin: 0, fontSize: 11, fontWeight: 600, textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>{stadium?.location || 'حي الشقيق، الرياض'}</p>
@@ -248,14 +250,19 @@ const StadiumSettings = ({ isRtl, stadium, onUpdate }) => {
   });
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const handleSave = async () => {
     setSaving(true);
     setSaveSuccess(false);
+    setSaveError(null);
     try {
       await onUpdate(formData);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      setSaveError(err.message || 'Failed to save');
+      setTimeout(() => setSaveError(null), 5000);
     } finally {
       setSaving(false);
     }
@@ -303,7 +310,7 @@ const StadiumSettings = ({ isRtl, stadium, onUpdate }) => {
         </h2>
         <ImageUpload 
           label={isRtl ? 'صورة الملعب الرئيسية' : 'Main Stadium Photo'} 
-          initialUrl={formData.photoUrl}
+          initialUrl={getImageUrl(formData.photoUrl, null)}
           category="stadiums"
           isRtl={isRtl}
           onUploadComplete={(url) => setFormData(prev => ({ ...prev, photoUrl: url }))}
@@ -317,7 +324,7 @@ const StadiumSettings = ({ isRtl, stadium, onUpdate }) => {
         </h2>
         <ImageUpload 
           label={isRtl ? 'ارفع وثيقة الملكية (PDF/صورة)' : 'Upload ownership document (PDF/Image)'} 
-          initialUrl={formData.ownershipDocUrl}
+          initialUrl={getImageUrl(formData.ownershipDocUrl, null)}
           category="documents"
           isRtl={isRtl}
           onUploadComplete={(url) => setFormData(prev => ({ ...prev, ownershipDocUrl: url }))}
@@ -388,7 +395,7 @@ const StadiumSettings = ({ isRtl, stadium, onUpdate }) => {
             disabled={saving}
             style={{ 
               marginTop: 10, width: '100%', padding: 16, 
-              backgroundColor: saveSuccess ? '#059669' : GREEN, 
+              backgroundColor: saveSuccess ? '#059669' : saveError ? '#EF4444' : GREEN, 
               color: 'white', border: 'none', borderRadius: 16, 
               fontWeight: 800, cursor: saving ? 'default' : 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -401,10 +408,22 @@ const StadiumSettings = ({ isRtl, stadium, onUpdate }) => {
               <>{isRtl ? 'جاري الحفظ...' : 'Saving...'}</>
             ) : saveSuccess ? (
               <>{isRtl ? '✓ تم الحفظ بنجاح' : '✓ Saved Successfully'}</>
+            ) : saveError ? (
+              <>{isRtl ? '✗ فشل الحفظ' : '✗ Save Failed'}</>
             ) : (
               <><Save size={18} /> {isRtl ? 'حفظ التغييرات' : 'Save Changes'}</>
             )}
           </button>
+
+          {saveError && (
+            <div style={{
+              marginTop: 8, padding: '10px 14px', borderRadius: 12,
+              backgroundColor: '#FEF2F2', color: '#DC2626',
+              fontSize: 12, fontWeight: 600, textAlign: 'center',
+            }}>
+              {saveError}
+            </div>
+          )}
         </div>
       </div>
     </motion.div>
@@ -456,12 +475,8 @@ const OwnerDashboard = ({ user, onLogout }) => {
   };
 
   const handleUpdateStadium = async (data) => {
-    try {
-      const updated = await DataService.updateStadium(stadium.id, { ownerId: user.id, ...data });
-      setStadium(updated);
-    } catch (err) {
-      throw err; // Let StadiumSettings catch it
-    }
+    const updated = await DataService.updateStadium(stadium?.id, { ownerId: user.id, ...data });
+    setStadium(updated);
   };
 
   return (
@@ -508,6 +523,16 @@ const OwnerDashboard = ({ user, onLogout }) => {
           )}
           {tab === 'dashboard' && <DashboardHome key="dash" user={user} isRtl={isRtl} t={t} stadium={stadium} stats={stats} bookings={bookings} onAcceptBooking={handleAccept} onRejectBooking={handleReject} />}
           {tab === 'ratings' && <RatingsReviewsScreen key="rate" isRtl={isRtl} stats={stats} />}
+          {tab === 'scan' && (
+            <QrScanner 
+              key="scanner" 
+              onScanSuccess={async () => {
+                // Refresh bookings after scan
+                const stadiumBookings = await DataService.getStadiumBookings(stadium.id);
+                setBookings(stadiumBookings);
+              }} 
+            />
+          )}
           {tab === 'settings' && <StadiumSettings key="settings" isRtl={isRtl} stadium={stadium} onUpdate={handleUpdateStadium} />}
           {tab === 'profile' && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: 40, textAlign: 'center' }}>
@@ -533,6 +558,7 @@ const OwnerDashboard = ({ user, onLogout }) => {
           {[
             { id: 'profile', icon: '👤', label: isRtl ? 'حسابي' : 'PROFILE' },
             { id: 'settings', icon: '⚙️', label: isRtl ? 'الإعدادات' : 'SETTINGS' },
+            { id: 'scan', icon: '🔍', label: isRtl ? 'مسح' : 'SCAN' },
             { id: 'notifications', icon: '🔔', label: isRtl ? 'تنبيهات' : 'ALERTS' },
             { id: 'ratings', icon: '⭐', label: isRtl ? 'تقييمات' : 'REVIEWS' },
             { id: 'dashboard', icon: '📊', label: isRtl ? 'الرئيسية' : 'DASHBOARD' },

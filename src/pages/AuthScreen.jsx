@@ -78,7 +78,7 @@ const Field = ({ label, name, type = 'text', placeholder, iconRight, value, onCh
 };
 
 /* ─── Main Component ─── */
-const AuthScreen = ({ type, role, onBack, onAuthSuccess, onSwitchToLogin, onSwitchToSignup }) => {
+const AuthScreen = ({ type, role, onBack, onAuthSuccess, onSwitchToLogin, onSwitchToSignup, onForgotPassword }) => {
   const { t, i18n } = useTranslation();
   const isSignup = type === 'signup';
   const isOwner = role === 'owner';
@@ -332,7 +332,7 @@ const AuthScreen = ({ type, role, onBack, onAuthSuccess, onSwitchToLogin, onSwit
               <Field label={t('auth.email')} name="email" type="email" placeholder={t('auth.email_placeholder')} iconRight="✉️" value={formData.email} onChange={handleChange} />
               <Field label={t('auth.password')} name="password" type="password" placeholder={t('auth.password_placeholder')} iconRight="🔒" value={formData.password} onChange={handleChange} />
               <div style={{ textAlign: isRtl ? 'left' : 'right', marginBottom: 8 }}>
-                <button type="button" style={{ background: 'none', border: 'none', color: '#22C55E', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
+                <button type="button" onClick={onForgotPassword} style={{ background: 'none', border: 'none', color: '#22C55E', fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: "'Cairo', sans-serif" }}>
                   {t('auth.forgot_password')}
                 </button>
               </div>
@@ -364,30 +364,6 @@ const AuthScreen = ({ type, role, onBack, onAuthSuccess, onSwitchToLogin, onSwit
               ? (isOwner ? t('auth.submit_owner_signup') : t('auth.submit_signup'))
               : t('auth.submit_login')}
           </motion.button>
-
-          {/* Social (Login only) */}
-          {!isSignup && (
-            <>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '20px 0' }}>
-                <div style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
-                <span style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                  {t('auth.or_login_with')}
-                </span>
-                <div style={{ flex: 1, height: 1, backgroundColor: '#E5E7EB' }} />
-              </div>
-              <div style={{ display: 'flex', gap: 12 }}>
-                {['🍎 Apple', '🌐 Google'].map(label => (
-                  <button key={label} type="button" style={{
-                    flex: 1, padding: '13px 0', border: '1.5px solid #E5E7EB', borderRadius: 12,
-                    backgroundColor: 'white', fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                    fontFamily: "'Cairo', sans-serif",
-                  }}>
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </>
-          )}
 
           {/* Switch link */}
           <div style={{ textAlign: 'center', marginTop: 22 }}>

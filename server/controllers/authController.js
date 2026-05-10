@@ -33,8 +33,17 @@ export const signup = async (req, res) => {
       const photoFile = req.files?.['photo']?.[0];
       const docFile = req.files?.['ownershipDoc']?.[0];
       
-      const photoUrl = photoFile ? `/uploads/${photoFile.filename}` : null;
-      const ownershipDocUrl = docFile ? `/uploads/${docFile.filename}` : null;
+      // Build the URL using the actual path where multer stored the file
+      const getUploadUrl = (file) => {
+        if (!file) return null;
+        // Extract category from the destination path (e.g. ".../uploads/stadiums" → "stadiums")
+        const parts = file.destination.replace(/\\/g, '/').split('/');
+        const category = parts[parts.length - 1]; // last folder = category
+        return `/uploads/${category}/${file.filename}`;
+      };
+      
+      const photoUrl = getUploadUrl(photoFile);
+      const ownershipDocUrl = getUploadUrl(docFile);
 
       stadium = await prisma.stadium.create({
         data: {

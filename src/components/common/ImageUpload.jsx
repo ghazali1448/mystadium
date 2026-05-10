@@ -73,7 +73,7 @@ const ImageUpload = ({
     try {
       const result = await UploadService.uploadFile(file, category, (pct) => setProgress(pct));
       setUploadedUrl(result.url);
-      onUploadComplete(result.fullUrl);
+      onUploadComplete(result.url);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
